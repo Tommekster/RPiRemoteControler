@@ -12,28 +12,27 @@ lastTime = time.time()
 newEvent = False
 times = list()
 
-def decodeRC():
+def list2num(l):
+	b = 1
+	n = 0
+	for i in l:
+		n = n + i*b
+		b = 2*b
+	return n
+
+def printResult(a,c):
+	print(a,c)
+
+def decodeRC(callback = printResult):
 	global newEvent
 	newEvent = False
-	#print("Button has been pressed, length of list of times: " + str(len(times)))
 	if len(times) < 34:
 		return
 	ivs = [(u-v) for u,v in zip(times[1:],times)]
 	data = [int(i>0.0012) for i in ivs[1:33]]
-	#print(data)
-	# decode address 
-	a = 0
-	b = 1
-	for d in data[0:8]:
-		a = a + b*d
-		b = 2*b
-	# decode command
-	c = 0
-	b = 1
-	for d in data[16:24]:
-		c = c + b*d
-		b = 2*b
-	print(a,c)	
+	address = list2num(data[0:8])
+	command = list2num(data[16:24])
+	callback(address, command)	
 	del times[:]
 
 def myCallback(pin):
@@ -43,16 +42,25 @@ def myCallback(pin):
 	times.append(time.time())
 	newEvent = True
 
-if __name__ == '__main__':
+def setup(pin):
 	GPIO.setmode(GPIO.BOARD)
-	GPIO.setup(channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.add_event_detect(channel, GPIO.FALLING, callback=myCallback)
+	GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	GPIO.add_event_detect(pin, GPIO.FALLING, callback=myCallback)
+
+def cleanup(pin):
+	GPIO.remove_event_detect(pin)
+	GPIO.cleanup()
+
+def poolRC(callback = printResult):
+	while True:
+		time.sleep(0.5)
+		if newEvent and time.time() > (lastTime + 0.03): 
+			decodeRC(callback)
+
+if __name__ == '__main__':
+	setup(channel)
 	try:
-		while True:
-			time.sleep(0.5)
-			if newEvent and time.time() > (lastTime + 0.03): 
-				decodeRC()
+		poolRC()
 	except KeyboardInterrupt:
 		pass
-	GPIO.remove_event_detect(channel)
-	GPIO.cleanup()
+	cleanup(channel)
