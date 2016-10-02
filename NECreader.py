@@ -15,14 +15,25 @@ times = list()
 def decodeRC():
 	global newEvent
 	newEvent = False
-	print("Button has been pressed, length of list of times: " + str(len(times)))
-	if len(times) == 0:
+	#print("Button has been pressed, length of list of times: " + str(len(times)))
+	if len(times) < 34:
 		return
-	intervals = [(u-v) for u,v in zip(times[1:],times)]
-	print("Intervals:")
-	for i in intervals:
-		print(str(i))
-	print(" ")
+	ivs = [(u-v) for u,v in zip(times[1:],times)]
+	data = [int(i>0.0012) for i in ivs[1:33]]
+	#print(data)
+	# decode address 
+	a = 0
+	b = 1
+	for d in data[0:8]:
+		a = a + b*d
+		b = 2*b
+	# decode command
+	c = 0
+	b = 1
+	for d in data[16:24]:
+		c = c + b*d
+		b = 2*b
+	print(a,c)	
 	del times[:]
 
 def myCallback(pin):
@@ -31,7 +42,6 @@ def myCallback(pin):
 	lastTime = time.time()
 	times.append(time.time())
 	newEvent = True
-	#print("Callback")
 
 if __name__ == '__main__':
 	GPIO.setmode(GPIO.BOARD)
