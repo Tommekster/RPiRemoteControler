@@ -39,7 +39,14 @@ class omxplayer_dBus:
 		dbus_send_cmd = ["dbus-send", "--print-reply=literal", "--session", "--reply-timeout="+str(s.timeout), "--dest="+s.destination, s.path, property]
 		dbus_send_cmd.extend(args)
 		#return " ".join(dbus_send_cmd)
-		response = subprocess.check_output(dbus_send_cmd, env=my_env)
+		try:
+			response = subprocess.check_output(dbus_send_cmd, env=my_env)
+		except subprocess.CalledProcessError as e:
+			print('CalledProcessError')
+			print("Command: " + " ".join(dbus_send_cmd))
+			print("Exit code: " + str(e.returncode))
+			print("Output: " + str(e.output))
+			return ""
 		return response
 	
 	def getDuration(s):
