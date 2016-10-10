@@ -2,6 +2,7 @@
 
 import subprocess
 import os
+import getpass
 
 # References:
 # 
@@ -23,7 +24,7 @@ class omxplayer_dBus:
 		s.setOmxplayerBusAddress()
 
 	def setOmxplayerBusAddress(s):
-		user = "pi" # TODO username from system
+		user = getpass.getuser()
 		with open("/tmp/omxplayerdbus."+user,"r") as f:
 			l = f.readline()
 			s.address = l.rstrip() 

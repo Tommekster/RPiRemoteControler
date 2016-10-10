@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 import NECreader
 from omxplayerDBUSsend import omxplayer_dBus
+import subprocess
 
 # Chart: generic IR remote control from china
 # It sends address 0 and (command)
@@ -33,6 +34,7 @@ class remoteControl:
 		pass
 		
 	def actPlayPause(s):
+		#subprocess.call(["bash","omxctr.sh","pause"])
 		s.bus.pause()
 
 	def actVolumeUp(s):
