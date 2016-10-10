@@ -62,11 +62,29 @@ class omxplayer_dBus:
 		return str(status)
 		
 	def omxplayerAction(s,action):
-		response = s.send(s.iPlayer+".Action",[action])
+		s.send(s.iPlayer+".Action",[action])
 
 	def pause(s):
 		s.omxplayerAction("int32:16")
+
+	def volumeUp(s):
+		s.omxplayerAction("int32:18")
+
+	def volumeDown(s):
+		s.omxplayerAction("int32:17")
+
+	def stop(s):
+		s.omxplayerAction("int32:15")
 		
+	def seek(s,position):
+		s.send(s.iPlayer+".Seek",["int64:"+str(position)])
+		
+	def seekStep(s,forward=True):
+		duration = s.getDuration()
+		position = s.getPosition()
+		newPosition = (2*bool(forward)-1)*duration/20+position
+		newPosition = max(0,min(duration,int(newPosition)))
+		s.seek(newPosition)
 
 if __name__ == '__main__':
 	b = omxplayer_dBus()
