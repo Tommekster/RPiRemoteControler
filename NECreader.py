@@ -8,6 +8,8 @@ import time
 #import threading.Timer as Timer
 #from threading import Timer
 
+# https://docs.python.org/2/library/signal.html
+
 lastTime = time.time()
 newEvent = False
 times = list()
@@ -51,11 +53,14 @@ def cleanup(pin):
 	GPIO.remove_event_detect(pin)
 	GPIO.cleanup()
 
+def callIfEvent(callback):
+	if newEvent and time.time() > (lastTime + 0.03): 
+		decodeRC(callback)
+
 def poolRC(callback = printResult):
 	while True:
 		time.sleep(0.5)
-		if newEvent and time.time() > (lastTime + 0.03): 
-			decodeRC(callback)
+		acceptEvent(callback)
 
 if __name__ == '__main__':
 	setup(channel)
