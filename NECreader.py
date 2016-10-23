@@ -60,7 +60,7 @@ def callIfEvent(callback):
 def poolRC(callback = printResult):
 	while True:
 		time.sleep(0.5)
-		acceptEvent(callback)
+		callIfEvent(callback)
 
 if __name__ == '__main__':
 	setup(channel)
